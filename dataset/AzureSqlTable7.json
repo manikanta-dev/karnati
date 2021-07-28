@@ -1,0 +1,63 @@
+{
+	"name": "AzureSqlTable7",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "JOB_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "JOB_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SOURCE_TYPE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "S_TABLE_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LOAD_TYPE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TARGET_TABLE_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TARGET_SCHEMA_TYPE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TARGET_LOAD_TYPE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "JOB_TYPE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DESIGN_PATTERN",
+				"type": "nvarchar"
+			},
+			{
+				"name": "WATERMARK_VALUE",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "METADATA_DRIVENTABLE"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,286 @@
+{
+	"name": "AzureSqlTable3",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "POLICY_NUMBER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ADDRESS",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CITY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "COUNTY_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "STATE_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ZIP",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LATITUDE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LONGITUDE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "POLICY_EFF_DATE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "AGENT",
+				"type": "nvarchar"
+			},
+			{
+				"name": "POLICY_FORM",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BUSINESS_SEGMENT",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TIV",
+				"type": "nvarchar"
+			},
+			{
+				"name": "WRITTEN_PREMIUM",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DEDUCTABLE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_esdb_building_attributes_buildingHeight",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_esdb_building_attributes_floorOccupancy",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_esdb_building_attributes_garagingDescription",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_esdb_building_attributes_numOfStories",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_esdb_building_attributes_pool",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_esdb_building_attributes_roofCoverCode",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_esdb_building_attributes_roofCoverDescription",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_esdb_building_attributes_yearBuilt",
+				"type": "nvarchar"
+			},
+			{
+				"name": "na_eq_hazard_landslideDescription",
+				"type": "nvarchar"
+			},
+			{
+				"name": "na_eq_hazard_landslideIndex",
+				"type": "nvarchar"
+			},
+			{
+				"name": "na_eq_hazard_liquefactionDescription",
+				"type": "nvarchar"
+			},
+			{
+				"name": "na_eq_hazard_liquefactionIndex",
+				"type": "nvarchar"
+			},
+			{
+				"name": "na_ws_hazard_distanceToCoast",
+				"type": "nvarchar"
+			},
+			{
+				"name": "na_ws_hazard_distanceToCoastUnit",
+				"type": "nvarchar"
+			},
+			{
+				"name": "na_ws_hazard_elevationGround",
+				"type": "nvarchar"
+			},
+			{
+				"name": "na_ws_hazard_elevationGroundUnit",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlr",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlrHail",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlrTornado",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlrWind",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_cs_loss_cost_groundUpLoss",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_cs_risk_score_scoreOverall",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_eq_loss_cost_buildingAlr",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_eq_loss_cost_groundUpLoss",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_eq_risk_score_scoreOverall",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_fema_firm_floodZone",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_fema_firm_floodway",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_fl_loss_cost_buildingAlr",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_fl_loss_cost_buildingAlrFlood",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_fl_loss_cost_buildingAlrSurge",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_fl_loss_cost_grossLoss",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_fl_loss_cost_groundUpLoss",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_fl_risk_score_score100yr",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_fl_risk_score_scoreOverall",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_mmi_mmi100yr",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_wf_supplemental_hazard_distanceToCalfireHigh",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_wf_supplemental_hazard_distanceToCalfireMedium",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_wf_supplemental_hazard_distanceToCalfireVeryHigh",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_ws_loss_cost_buildingAlr",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_ws_risk_score_score100yr",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_ws_risk_score_scoreOverall",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_wt_loss_cost_buildingAlr",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_wt_risk_score_score50yr",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_wt_risk_score_scoreOverall",
+				"type": "nvarchar"
+			},
+			{
+				"name": "na_eq_hazard_liquefactionIndex_IND",
+				"type": "nvarchar"
+			},
+			{
+				"name": "na_ws_hazard_distanceToCoast_IND",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlrHail_IND",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlrTornado_IND",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_eq_loss_cost_buildingAlr_IND",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_fl_loss_cost_buildingAlrFlood_IND",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_wf_supplemental_hazard_distanceToCalfireVeryHigh_IND",
+				"type": "nvarchar"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlrWind_IND",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Azure Data Lake Storage Gen2 file"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

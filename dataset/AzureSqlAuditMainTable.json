@@ -1,0 +1,61 @@
+{
+	"name": "AzureSqlAuditMainTable",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlAuditMainTable",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "ABC_Dataset"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Master_Audit_ID",
+				"type": "varchar"
+			},
+			{
+				"name": "Audit_Category",
+				"type": "varchar"
+			},
+			{
+				"name": "Audit_Layer",
+				"type": "varchar"
+			},
+			{
+				"name": "Source_Type",
+				"type": "varchar"
+			},
+			{
+				"name": "Target_Type",
+				"type": "varchar"
+			},
+			{
+				"name": "Batch_Start_Timestamp",
+				"type": "varchar"
+			},
+			{
+				"name": "Batch_End_Timestamp",
+				"type": "varchar"
+			},
+			{
+				"name": "Error_String",
+				"type": "varchar"
+			},
+			{
+				"name": "Restart_Flag",
+				"type": "bit"
+			},
+			{
+				"name": "batch_status",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "ABC_MAIN_TABLE"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

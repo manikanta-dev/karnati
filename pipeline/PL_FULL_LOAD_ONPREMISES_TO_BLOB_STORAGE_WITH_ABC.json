@@ -1,0 +1,467 @@
+{
+	"name": "PL_FULL_LOAD_ONPREMISES_TO_BLOB_STORAGE_WITH_ABC",
+	"properties": {
+		"activities": [
+			{
+				"name": "GET_METADATA_TABLE",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ABCMainExists",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT * FROM [dbo].[METADATA_DRIVENTABLE] where source_type='sql_table' and load_type='full'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_azuresql",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "LOOPING_TABLES",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GET_METADATA_TABLE",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GET_METADATA_TABLE').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Load_Table_Data",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".csv"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "Ds_onpremises_sqlserver",
+									"type": "DatasetReference",
+									"parameters": {
+										"Table_Name": {
+											"value": "@item().S_TABLE_NAME",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_BLOB_FILES",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_Name": {
+											"value": "@concat(item().S_TABLE_NAME,'.csv')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "ABC_INFORMATION",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Load_Table_Data",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[SP_ABC_INFORMATION]",
+								"storedProcedureParameters": {
+									"BATCH_ID": {
+										"value": {
+											"value": "@utcnow()",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"CDC_COLUMN_NAME": {
+										"value": null,
+										"type": "String"
+									},
+									"CDC_COLUMN_VALUE": {
+										"value": null,
+										"type": "Int64"
+									},
+									"EXCEPTION_RECORD_COUNT": {
+										"value": null,
+										"type": "Int64"
+									},
+									"JOB_ID": {
+										"value": {
+											"value": "@item().JOB_ID",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"JOB_NAME": {
+										"value": {
+											"value": "@item().JOB_NAME",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"JOB_STATUS": {
+										"value": {
+											"value": "@activity('Load_Table_Data').status",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"RUNTIME_PARAMETER_ID": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"SOURCE_RECORD_COUNT": {
+										"value": {
+											"value": "@activity('Load_Table_Data').output.rowsRead",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"TARGET_RECORD_COUNT": {
+										"value": {
+											"value": "@activity('Load_Table_Data').output.rowsCopied",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureSqlDatabase1",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "CollectStartTIme",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "BatchStartTime",
+					"value": {
+						"value": "@utcnow()",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ABCEntryCreate",
+				"type": "GetMetadata",
+				"dependsOn": [
+					{
+						"activity": "CollectStartTIme",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DS_ABC_Main_csv",
+						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"exists"
+					],
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "ABCMainExists",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "ABCEntryCreate",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@activity('ABCEntryCreate').output.exists",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "ABCAuditMain",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "1.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "ABCAuditMain",
+									"type": "DataFlowReference",
+									"parameters": {
+										"Master_Audit_ID": {
+											"value": "'@{pipeline().RunId}'",
+											"type": "Expression"
+										},
+										"Category": {
+											"value": "'@{variables('Category')}'",
+											"type": "Expression"
+										},
+										"AuditLayer": {
+											"value": "'@{variables('Layer')}'",
+											"type": "Expression"
+										},
+										"SourceType": {
+											"value": "'@{variables('SrcType')}'",
+											"type": "Expression"
+										},
+										"DestType": {
+											"value": "'@{variables('dstType')}'",
+											"type": "Expression"
+										},
+										"StartTimeStamp": {
+											"value": "'@{variables('BatchStartTime')}'",
+											"type": "Expression"
+										},
+										"EndTimeStamp": {
+											"value": "'@{variables('BatchEndTIme')}'",
+											"type": "Expression"
+										},
+										"Error": {
+											"value": "'@{variables('Error')}'",
+											"type": "Expression"
+										},
+										"RestartFlag": {
+											"value": "'@{variables('RestartFlag')}'",
+											"type": "Expression"
+										},
+										"Status": {
+											"value": "'@{variables('Status')}'",
+											"type": "Expression"
+										}
+									}
+								},
+								"compute": {
+									"coreCount": 8,
+									"computeType": "General"
+								},
+								"traceLevel": "Fine"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "ABCAuditMainAppend",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "1.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "ABCAuditMainAppend",
+									"type": "DataFlowReference",
+									"parameters": {
+										"Master_Audit_ID": {
+											"value": "'@{pipeline().RunId}'",
+											"type": "Expression"
+										},
+										"Category": {
+											"value": "'@{variables('Category')}'",
+											"type": "Expression"
+										},
+										"AuditLayer": {
+											"value": "'@{variables('Layer')}'",
+											"type": "Expression"
+										},
+										"SourceType": {
+											"value": "'@{variables('SrcType')}'",
+											"type": "Expression"
+										},
+										"DestType": {
+											"value": "'@{variables('dstType')}'",
+											"type": "Expression"
+										},
+										"StartTimeStamp": {
+											"value": "'@{variables('BatchStartTime')}'",
+											"type": "Expression"
+										},
+										"EndTimeStamp": {
+											"value": "'@{variables('BatchEndTIme')}'",
+											"type": "Expression"
+										},
+										"Error": {
+											"value": "'@{variables('Error')}'",
+											"type": "Expression"
+										},
+										"RestartFlag": {
+											"value": "'@{variables('RestartFlag')}'",
+											"type": "Expression"
+										},
+										"Status": {
+											"value": "'@{variables('Status')}'",
+											"type": "Expression"
+										}
+									}
+								},
+								"compute": {
+									"coreCount": 8,
+									"computeType": "General"
+								},
+								"traceLevel": "Fine"
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"BatchStartTime": {
+				"type": "String"
+			},
+			"BatchEndTIme": {
+				"type": "String",
+				"defaultValue": "--"
+			},
+			"Category": {
+				"type": "String",
+				"defaultValue": "RDB"
+			},
+			"Layer": {
+				"type": "String",
+				"defaultValue": "Ingestion"
+			},
+			"Status": {
+				"type": "String",
+				"defaultValue": "INPROGRESS"
+			},
+			"SrcType": {
+				"type": "String",
+				"defaultValue": "ONPREMISES_SQL"
+			},
+			"dstType": {
+				"type": "String",
+				"defaultValue": "AZURE_BLOB"
+			},
+			"Error": {
+				"type": "String",
+				"defaultValue": "--"
+			},
+			"RestartFlag": {
+				"type": "Boolean",
+				"defaultValue": false
+			}
+		},
+		"folder": {
+			"name": "ONPREMISES_SQL"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-07-13T20:07:26Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

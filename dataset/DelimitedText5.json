@@ -1,0 +1,295 @@
+{
+	"name": "DelimitedText5",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Multiple_tables_from_sql"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "maneendra"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "POLICY_NUMBER",
+				"type": "String"
+			},
+			{
+				"name": "ADDRESS",
+				"type": "String"
+			},
+			{
+				"name": "CITY",
+				"type": "String"
+			},
+			{
+				"name": "COUNTY_NAME",
+				"type": "String"
+			},
+			{
+				"name": "STATE_CODE",
+				"type": "String"
+			},
+			{
+				"name": "ZIP",
+				"type": "String"
+			},
+			{
+				"name": "LATITUDE",
+				"type": "String"
+			},
+			{
+				"name": "LONGITUDE",
+				"type": "String"
+			},
+			{
+				"name": "POLICY_EFF_DATE",
+				"type": "String"
+			},
+			{
+				"name": "AGENT",
+				"type": "String"
+			},
+			{
+				"name": "POLICY_FORM",
+				"type": "String"
+			},
+			{
+				"name": "BUSINESS_SEGMENT",
+				"type": "String"
+			},
+			{
+				"name": "TIV",
+				"type": "String"
+			},
+			{
+				"name": "WRITTEN_PREMIUM",
+				"type": "String"
+			},
+			{
+				"name": "DEDUCTABLE",
+				"type": "String"
+			},
+			{
+				"name": "us_esdb_building_attributes_buildingHeight",
+				"type": "String"
+			},
+			{
+				"name": "us_esdb_building_attributes_floorOccupancy",
+				"type": "String"
+			},
+			{
+				"name": "us_esdb_building_attributes_garagingDescription",
+				"type": "String"
+			},
+			{
+				"name": "us_esdb_building_attributes_numOfStories",
+				"type": "String"
+			},
+			{
+				"name": "us_esdb_building_attributes_pool",
+				"type": "String"
+			},
+			{
+				"name": "us_esdb_building_attributes_roofCoverCode",
+				"type": "String"
+			},
+			{
+				"name": "us_esdb_building_attributes_roofCoverDescription",
+				"type": "String"
+			},
+			{
+				"name": "us_esdb_building_attributes_yearBuilt",
+				"type": "String"
+			},
+			{
+				"name": "na_eq_hazard_landslideDescription",
+				"type": "String"
+			},
+			{
+				"name": "na_eq_hazard_landslideIndex",
+				"type": "String"
+			},
+			{
+				"name": "na_eq_hazard_liquefactionDescription",
+				"type": "String"
+			},
+			{
+				"name": "na_eq_hazard_liquefactionIndex",
+				"type": "String"
+			},
+			{
+				"name": "na_ws_hazard_distanceToCoast",
+				"type": "String"
+			},
+			{
+				"name": "na_ws_hazard_distanceToCoastUnit",
+				"type": "String"
+			},
+			{
+				"name": "na_ws_hazard_elevationGround",
+				"type": "String"
+			},
+			{
+				"name": "na_ws_hazard_elevationGroundUnit",
+				"type": "String"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlr",
+				"type": "String"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlrHail",
+				"type": "String"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlrTornado",
+				"type": "String"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlrWind",
+				"type": "String"
+			},
+			{
+				"name": "us_cs_loss_cost_groundUpLoss",
+				"type": "String"
+			},
+			{
+				"name": "us_cs_risk_score_scoreOverall",
+				"type": "String"
+			},
+			{
+				"name": "us_eq_loss_cost_buildingAlr",
+				"type": "String"
+			},
+			{
+				"name": "us_eq_loss_cost_groundUpLoss",
+				"type": "String"
+			},
+			{
+				"name": "us_eq_risk_score_scoreOverall",
+				"type": "String"
+			},
+			{
+				"name": "us_fema_firm_floodZone",
+				"type": "String"
+			},
+			{
+				"name": "us_fema_firm_floodway",
+				"type": "String"
+			},
+			{
+				"name": "us_fl_loss_cost_buildingAlr",
+				"type": "String"
+			},
+			{
+				"name": "us_fl_loss_cost_buildingAlrFlood",
+				"type": "String"
+			},
+			{
+				"name": "us_fl_loss_cost_buildingAlrSurge",
+				"type": "String"
+			},
+			{
+				"name": "us_fl_loss_cost_grossLoss",
+				"type": "String"
+			},
+			{
+				"name": "us_fl_loss_cost_groundUpLoss",
+				"type": "String"
+			},
+			{
+				"name": "us_fl_risk_score_score100yr",
+				"type": "String"
+			},
+			{
+				"name": "us_fl_risk_score_scoreOverall",
+				"type": "String"
+			},
+			{
+				"name": "us_mmi_mmi100yr",
+				"type": "String"
+			},
+			{
+				"name": "us_wf_supplemental_hazard_distanceToCalfireHigh",
+				"type": "String"
+			},
+			{
+				"name": "us_wf_supplemental_hazard_distanceToCalfireMedium",
+				"type": "String"
+			},
+			{
+				"name": "us_wf_supplemental_hazard_distanceToCalfireVeryHigh",
+				"type": "String"
+			},
+			{
+				"name": "us_ws_loss_cost_buildingAlr",
+				"type": "String"
+			},
+			{
+				"name": "us_ws_risk_score_score100yr",
+				"type": "String"
+			},
+			{
+				"name": "us_ws_risk_score_scoreOverall",
+				"type": "String"
+			},
+			{
+				"name": "us_wt_loss_cost_buildingAlr",
+				"type": "String"
+			},
+			{
+				"name": "us_wt_risk_score_score50yr",
+				"type": "String"
+			},
+			{
+				"name": "us_wt_risk_score_scoreOverall",
+				"type": "String"
+			},
+			{
+				"name": "na_eq_hazard_liquefactionIndex_IND",
+				"type": "String"
+			},
+			{
+				"name": "na_ws_hazard_distanceToCoast_IND",
+				"type": "String"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlrHail_IND",
+				"type": "String"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlrTornado_IND",
+				"type": "String"
+			},
+			{
+				"name": "us_eq_loss_cost_buildingAlr_IND",
+				"type": "String"
+			},
+			{
+				"name": "us_fl_loss_cost_buildingAlrFlood_IND",
+				"type": "String"
+			},
+			{
+				"name": "us_wf_supplemental_hazard_distanceToCalfireVeryHigh_IND",
+				"type": "String"
+			},
+			{
+				"name": "us_cs_loss_cost_buildingAlrWind_IND",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

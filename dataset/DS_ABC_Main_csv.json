@@ -1,23 +1,24 @@
 {
-	"name": "DelimitedText1",
+	"name": "DS_ABC_Main_csv",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "LS_ABC_Dummy",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "Metadata_dataset"
+			"name": "ABC_Dataset"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobFSLocation",
-				"fileSystem": "rpmsdata"
+				"type": "AzureBlobStorageLocation",
+				"fileName": "abc_main.csv",
+				"folderPath": "ABC_Info",
+				"container": "testapiak"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
-			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
 		"schema": []

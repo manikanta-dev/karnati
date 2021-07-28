@@ -1,15 +1,14 @@
 {
-	"name": "AzureSqlTable1",
+	"name": "DestinationDataset_0hk",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureSqlDatabase1",
+			"referenceName": "AzureSqlDatabaseFROmASDL",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"schema": "dbo",
 			"table": "Azure Data Lake Storage Gen2 file"
 		}
 	},

@@ -1,17 +1,18 @@
 {
-	"name": "AzureSqlTable1",
+	"name": "Json1",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureSqlDatabase1",
+			"referenceName": "AzureDataLakeStorage2",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
-		"type": "AzureSqlTable",
-		"schema": [],
+		"type": "Json",
 		"typeProperties": {
-			"schema": "dbo",
-			"table": "Azure Data Lake Storage Gen2 file"
-		}
+			"location": {
+				"type": "AzureBlobFSLocation"
+			}
+		},
+		"schema": {}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
 }

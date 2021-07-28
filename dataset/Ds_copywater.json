@@ -1,0 +1,13 @@
+{
+	"name": "Ds_copywater",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ONPREMISES",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

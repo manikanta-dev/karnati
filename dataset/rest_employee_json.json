@@ -1,0 +1,24 @@
+{
+	"name": "rest_employee_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ABC_Dummy",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@concat('employee_',formatDateTime(convertTimeZone(utcnow(),'UTC','Eastern Standard Time'),'yyyy-MM-dd_HHmmss'), '.json')",
+					"type": "Expression"
+				},
+				"folderPath": "rest_employee",
+				"container": "testapiak"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

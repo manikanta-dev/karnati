@@ -1,0 +1,933 @@
+{
+	"name": "Metadata_",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Metadata1",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DelimitedText1",
+						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"lastModified"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(activity('Get Metadata1').output.exists,true)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Wait1",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 10
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"wildcardFileName": "*csv",
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert"
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"name": "POLICY_NUMBER",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "POLICY_NUMBER",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "ADDRESS",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "ADDRESS",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "CITY",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "CITY",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "COUNTY_NAME",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "COUNTY_NAME",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "STATE_CODE",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "STATE_CODE",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "ZIP",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "ZIP",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "LATITUDE",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "LATITUDE",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "LONGITUDE",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "LONGITUDE",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "POLICY_EFF_DATE",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "POLICY_EFF_DATE",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "AGENT",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "AGENT",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "POLICY_FORM",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "POLICY_FORM",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "BUSINESS_SEGMENT",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "BUSINESS_SEGMENT",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "TIV",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "TIV",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "WRITTEN_PREMIUM",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "WRITTEN_PREMIUM",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "DEDUCTABLE",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "DEDUCTABLE",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_esdb_building_attributes_buildingHeight",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_esdb_building_attributes_buildingHeight",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_esdb_building_attributes_floorOccupancy",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_esdb_building_attributes_floorOccupancy",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_esdb_building_attributes_garagingDescription",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_esdb_building_attributes_garagingDescription",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_esdb_building_attributes_numOfStories",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_esdb_building_attributes_numOfStories",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_esdb_building_attributes_pool",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_esdb_building_attributes_pool",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_esdb_building_attributes_roofCoverCode",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_esdb_building_attributes_roofCoverCode",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_esdb_building_attributes_roofCoverDescription",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_esdb_building_attributes_roofCoverDescription",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_esdb_building_attributes_yearBuilt",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_esdb_building_attributes_yearBuilt",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "na_eq_hazard_landslideDescription",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "na_eq_hazard_landslideDescription",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "na_eq_hazard_landslideIndex",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "na_eq_hazard_landslideIndex",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "na_eq_hazard_liquefactionDescription",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "na_eq_hazard_liquefactionDescription",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "na_eq_hazard_liquefactionIndex",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "na_eq_hazard_liquefactionIndex",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "na_ws_hazard_distanceToCoast",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "na_ws_hazard_distanceToCoast",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "na_ws_hazard_distanceToCoastUnit",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "na_ws_hazard_distanceToCoastUnit",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "na_ws_hazard_elevationGround",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "na_ws_hazard_elevationGround",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "na_ws_hazard_elevationGroundUnit",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "na_ws_hazard_elevationGroundUnit",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_cs_loss_cost_buildingAlr",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_cs_loss_cost_buildingAlr",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_cs_loss_cost_buildingAlrHail",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_cs_loss_cost_buildingAlrHail",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_cs_loss_cost_buildingAlrTornado",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_cs_loss_cost_buildingAlrTornado",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_cs_loss_cost_buildingAlrWind",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_cs_loss_cost_buildingAlrWind",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_cs_loss_cost_groundUpLoss",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_cs_loss_cost_groundUpLoss",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_cs_risk_score_scoreOverall",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_cs_risk_score_scoreOverall",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_eq_loss_cost_buildingAlr",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_eq_loss_cost_buildingAlr",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_eq_loss_cost_groundUpLoss",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_eq_loss_cost_groundUpLoss",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_eq_risk_score_scoreOverall",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_eq_risk_score_scoreOverall",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_fema_firm_floodZone",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_fema_firm_floodZone",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_fema_firm_floodway",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_fema_firm_floodway",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_fl_loss_cost_buildingAlr",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_fl_loss_cost_buildingAlr",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_fl_loss_cost_buildingAlrFlood",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_fl_loss_cost_buildingAlrFlood",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_fl_loss_cost_buildingAlrSurge",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_fl_loss_cost_buildingAlrSurge",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_fl_loss_cost_grossLoss",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_fl_loss_cost_grossLoss",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_fl_loss_cost_groundUpLoss",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_fl_loss_cost_groundUpLoss",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_fl_risk_score_score100yr",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_fl_risk_score_score100yr",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_fl_risk_score_scoreOverall",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_fl_risk_score_scoreOverall",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_mmi_mmi100yr",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_mmi_mmi100yr",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_wf_supplemental_hazard_distanceToCalfireHigh",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_wf_supplemental_hazard_distanceToCalfireHigh",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_wf_supplemental_hazard_distanceToCalfireMedium",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_wf_supplemental_hazard_distanceToCalfireMedium",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_wf_supplemental_hazard_distanceToCalfireVeryHigh",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_wf_supplemental_hazard_distanceToCalfireVeryHigh",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_ws_loss_cost_buildingAlr",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_ws_loss_cost_buildingAlr",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_ws_risk_score_score100yr",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_ws_risk_score_score100yr",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_ws_risk_score_scoreOverall",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_ws_risk_score_scoreOverall",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_wt_loss_cost_buildingAlr",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_wt_loss_cost_buildingAlr",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_wt_risk_score_score50yr",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_wt_risk_score_score50yr",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_wt_risk_score_scoreOverall",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_wt_risk_score_scoreOverall",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "na_eq_hazard_liquefactionIndex_IND",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "na_eq_hazard_liquefactionIndex_IND",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "na_ws_hazard_distanceToCoast_IND",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "na_ws_hazard_distanceToCoast_IND",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_cs_loss_cost_buildingAlrHail_IND",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_cs_loss_cost_buildingAlrHail_IND",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_cs_loss_cost_buildingAlrTornado_IND",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_cs_loss_cost_buildingAlrTornado_IND",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_eq_loss_cost_buildingAlr_IND",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_eq_loss_cost_buildingAlr_IND",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_fl_loss_cost_buildingAlrFlood_IND",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_fl_loss_cost_buildingAlrFlood_IND",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_wf_supplemental_hazard_distanceToCalfireVeryHigh_IND",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_wf_supplemental_hazard_distanceToCalfireVeryHigh_IND",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										},
+										{
+											"source": {
+												"name": "us_cs_loss_cost_buildingAlrWind_IND",
+												"type": "String",
+												"physicalType": "String"
+											},
+											"sink": {
+												"name": "us_cs_loss_cost_buildingAlrWind_IND",
+												"type": "String",
+												"physicalType": "nvarchar"
+											}
+										}
+									],
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DelimitedText1",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "AzureSqlTable2",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "Maneendra"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-06-24T12:44:18Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

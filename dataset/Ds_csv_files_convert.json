@@ -1,19 +1,16 @@
 {
-	"name": "DelimitedText1",
+	"name": "Ds_csv_files_convert",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "LS_BLOBMETA",
 			"type": "LinkedServiceReference"
-		},
-		"folder": {
-			"name": "Metadata_dataset"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobFSLocation",
-				"fileSystem": "rpmsdata"
+				"type": "AzureBlobStorageLocation",
+				"container": "metafiles"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

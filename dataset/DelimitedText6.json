@@ -1,19 +1,20 @@
 {
-	"name": "DelimitedText1",
+	"name": "DelimitedText6",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureDataLakeStorage1",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "Metadata_dataset"
+			"name": "Multiple_files_to_sql"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileSystem": "rpmsdata"
+				"folderPath": "sub",
+				"fileSystem": "maneendra"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

@@ -1,19 +1,17 @@
 {
-	"name": "DelimitedText1",
+	"name": "DelimitedText8",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "AzureDataLakeStorageCSV",
 			"type": "LinkedServiceReference"
-		},
-		"folder": {
-			"name": "Metadata_dataset"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileSystem": "rpmsdata"
+				"fileName": "employe.csv",
+				"fileSystem": "API"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

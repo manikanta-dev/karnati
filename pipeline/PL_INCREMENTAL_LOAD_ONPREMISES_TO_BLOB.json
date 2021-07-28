@@ -1,0 +1,330 @@
+{
+	"name": "PL_INCREMENTAL_LOAD_ONPREMISES_TO_BLOB",
+	"properties": {
+		"activities": [
+			{
+				"name": "GET_META_DATA",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT * FROM [dbo].[METADATA_DRIVENTABLE] where LOAD_TYPE='INCREMENTAL'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "Ds_meta",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "LOOPING",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GET_META_DATA",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GET_META_DATA').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "GET_OLD_WATERMARK_TABLE",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "SELECT WATERMARK_VALUE,S_TABLE_NAME FROM OLD_WATERMARK WHERE S_TABLE_NAME='@{item().S_TABLE_NAME}'",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "Ds_Oldwatermark",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": true
+							}
+						},
+						{
+							"name": "New_Tables",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "SELECT MAX(@{item().WATERMARK_VALUE}) AS INSERDATETIME FROM @{item().S_TABLE_NAME}",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "Ds_NewTables",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": true
+							}
+						},
+						{
+							"name": "Copy _inc_data",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "GET_OLD_WATERMARK_TABLE",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "New_Tables",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "SELECT * FROM @{item().S_TABLE_NAME} WHERE @{item().WATERMARK_VALUE}>'@{activity('GET_OLD_WATERMARK_TABLE').output.firstRow.WATERMARK_VALUE}'\nAND\n@{item().WATERMARK_VALUE}<='@{activity('New_Tables').output.firstRow.INSERDATETIME}'",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "Ds_copywater",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "Ds_Incfiles",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_name": {
+											"value": "@concat(item().S_TABLE_NAME,'_',formatDateTime(utcnow(),'yyyyMMdd_HHmmss'),'.csv')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "UPDATE_WATERMARK",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Copy _inc_data",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[SP_WATER]",
+								"storedProcedureParameters": {
+									"S_TABLE_NAME": {
+										"value": {
+											"value": "@activity('GET_OLD_WATERMARK_TABLE').output.firstRow.S_TABLE_NAME",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"WATERMARK_VALUE": {
+										"value": {
+											"value": "@activity('New_Tables').output.firstRow.INSERDATETIME",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_ONPREMISES",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "ABC_INFORMATION",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "UPDATE_WATERMARK",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[SP_ABC_INFORMATION]",
+								"storedProcedureParameters": {
+									"BATCH_ID": {
+										"value": {
+											"value": "@utcnow()",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"CDC_COLUMN_NAME": {
+										"value": null,
+										"type": "String"
+									},
+									"CDC_COLUMN_VALUE": {
+										"value": null,
+										"type": "Int64"
+									},
+									"EXCEPTION_RECORD_COUNT": {
+										"value": null,
+										"type": "Int64"
+									},
+									"JOB_ID": {
+										"value": {
+											"value": "@item().JOB_ID",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"JOB_NAME": {
+										"value": {
+											"value": "@item().JOB_NAME",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"JOB_STATUS": {
+										"value": {
+											"value": "@activity('Copy _inc_data').status",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"RUNTIME_PARAMETER_ID": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"SOURCE_RECORD_COUNT": {
+										"value": {
+											"value": "@activity('Copy _inc_data').output.rowsRead",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"TARGET_RECORD_COUNT": {
+										"value": {
+											"value": "@activity('Copy _inc_data').output.rowsCopied",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureSqlDatabase1",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "ONPREMISES_SQL"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-07-23T09:17:45Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

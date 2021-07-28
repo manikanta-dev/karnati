@@ -1,19 +1,25 @@
 {
-	"name": "DelimitedText1",
+	"name": "Ds_Incfiles",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "LS_BLOBMETA",
 			"type": "LinkedServiceReference"
 		},
-		"folder": {
-			"name": "Metadata_dataset"
+		"parameters": {
+			"File_name": {
+				"type": "string"
+			}
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobFSLocation",
-				"fileSystem": "rpmsdata"
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().File_name",
+					"type": "Expression"
+				},
+				"container": "incrementalfiles"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

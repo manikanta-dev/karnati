@@ -1,0 +1,176 @@
+{
+	"name": "IndividualRestAPIWithABC",
+	"properties": {
+		"activities": [
+			{
+				"name": "PostPipelineAudit",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "CopyDataFromRestAPI",
+						"dependencyConditions": [
+							"Succeeded",
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "ABCAuditMainSQL",
+						"type": "DataFlowReference",
+						"parameters": {
+							"Master_Audit_ID": {
+								"value": "'@{pipeline().RunId}'",
+								"type": "Expression"
+							},
+							"Category": {
+								"value": "'@{variables('Category')}'",
+								"type": "Expression"
+							},
+							"AuditLayer": {
+								"value": "'@{variables('Layer')}'",
+								"type": "Expression"
+							},
+							"SourceType": {
+								"value": "'@{activity('CopyDataFromRestAPI').output.executionDetails[0].source.type}'",
+								"type": "Expression"
+							},
+							"DestType": {
+								"value": "'@{activity('CopyDataFromRestAPI').output.executionDetails[0].sink.type}'",
+								"type": "Expression"
+							},
+							"StartTimeStamp": {
+								"value": "'@{activity('CopyDataFromRestAPI').output.executionDetails[0].start}'",
+								"type": "Expression"
+							},
+							"EndTimeStamp": {
+								"value": "'@{utcnow()}'",
+								"type": "Expression"
+							},
+							"Error": {
+								"value": "'@{if(equals(activity('CopyDataFromRestAPI').output.executionDetails[0].status,'Succeeded'),'NIL',activity('CopyDataFromRestAPI').output.errors[0])}'",
+								"type": "Expression"
+							},
+							"RestartFlag": {
+								"value": "'@{variables('RestartFlag')}'",
+								"type": "Expression"
+							},
+							"Status": {
+								"value": "'@{activity('CopyDataFromRestAPI').output.executionDetails[0].status}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "CopyDataFromRestAPI",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET"
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "RestResource2",
+						"type": "DatasetReference",
+						"parameters": {
+							"API_URL": {
+								"value": "@variables('Rest_Api_URL')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "rest_employee_json",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"variables": {
+			"BatchStartTime": {
+				"type": "String"
+			},
+			"BatchEndTIme": {
+				"type": "String",
+				"defaultValue": "--"
+			},
+			"Category": {
+				"type": "String",
+				"defaultValue": "API_Data"
+			},
+			"Layer": {
+				"type": "String",
+				"defaultValue": "Ingestion"
+			},
+			"Status": {
+				"type": "String",
+				"defaultValue": "INPROGRESS"
+			},
+			"SrcType": {
+				"type": "String",
+				"defaultValue": "REST_API"
+			},
+			"dstType": {
+				"type": "String",
+				"defaultValue": "AZURE_BLOB"
+			},
+			"Error": {
+				"type": "String"
+			},
+			"RestartFlag": {
+				"type": "Boolean",
+				"defaultValue": false
+			},
+			"Rest_Api_URL": {
+				"type": "String",
+				"defaultValue": "https://gorest.co.in/public/v1/posts"
+			}
+		},
+		"folder": {
+			"name": "API"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-07-16T19:57:52Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

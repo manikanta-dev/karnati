@@ -1,0 +1,48 @@
+{
+	"name": "ABCAuditMainAppend",
+	"properties": {
+		"folder": {
+			"name": "ABC_INFO"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DSABCDummy",
+						"type": "DatasetReference"
+					},
+					"name": "AbcDummySrc"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_ABC_Main",
+						"type": "DatasetReference"
+					},
+					"name": "ABCMainExistingData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_ABC_Main",
+						"type": "DatasetReference"
+					},
+					"name": "ABCMainInfo"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumn1"
+				},
+				{
+					"name": "ABCInfoFilter"
+				},
+				{
+					"name": "ABCUpdateData"
+				}
+			],
+			"script": "parameters{\n\tMaster_Audit_ID as string,\n\tCategory as string,\n\tAuditLayer as string,\n\tSourceType as string,\n\tDestType as string,\n\tStartTimeStamp as string,\n\tEndTimeStamp as string,\n\tError as string,\n\tRestartFlag as string,\n\tStatus as string\n}\nsource(output(\n\t\tColumn_1 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinferDriftedColumnTypes: true,\n\tignoreNoFilesFound: false) ~> AbcDummySrc\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\twildcardPaths:[('ABC_Info/abc_main.csv')]) ~> ABCMainExistingData\nAbcDummySrc derive(Master_Audit_ID = $Master_Audit_ID,\n\t\tAudit_Category = $Category,\n\t\tAudit_Layer = $AuditLayer,\n\t\tSource_Type = $SourceType,\n\t\tTarget_Type = $DestType,\n\t\tBatch_Start_Timestamp = $StartTimeStamp,\n\t\tBatch_End_Timestamp = $EndTimeStamp,\n\t\tError = $Error,\n\t\tRestart_Flag = $RestartFlag,\n\t\tStatus = $Status) ~> DerivedColumn1\nDerivedColumn1 select(mapColumn(\n\t\tMaster_Audit_ID,\n\t\tAudit_Category,\n\t\tAudit_Layer,\n\t\tSource_Type,\n\t\tTarget_Type,\n\t\tBatch_Start_Timestamp,\n\t\tBatch_End_Timestamp,\n\t\tError,\n\t\tRestart_Flag,\n\t\tStatus\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> ABCInfoFilter\nABCInfoFilter, ABCMainExistingData union(byName: true)~> ABCUpdateData\nABCUpdateData sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:[('abc_main.csv')],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> ABCMainInfo"
+		}
+	}
+}

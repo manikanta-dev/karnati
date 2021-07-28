@@ -1,5 +1,5 @@
 {
-	"name": "AzureSqlTable1",
+	"name": "DestinationDataset_d9i",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureSqlDatabase1",
@@ -9,7 +9,6 @@
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"schema": "dbo",
 			"table": "Azure Data Lake Storage Gen2 file"
 		}
 	},

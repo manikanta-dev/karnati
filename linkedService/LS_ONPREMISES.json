@@ -1,0 +1,16 @@
+{
+	"name": "LS_ONPREMISES",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "integrated security=False;data source=spage-poc-sqldb-server.database.windows.net;initial catalog=spage-poc-sqldb;user id=sqladmin",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJjYzE4N2RkYy1hNDYzLTRkNjctOWM5Yy1kMGZlMTliNmFlYzAiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "Self-Ir",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

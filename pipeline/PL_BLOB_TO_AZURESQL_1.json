@@ -1,0 +1,437 @@
+{
+	"name": "PL_BLOB_TO_AZURESQL_1",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GET_METADATA_TABLE_B_to_S",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GET_METADATA_TABLE_B_to_S').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "LAST_UPDATED_DATE",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "select top 1 BATCH_ID FROM [dbo].[ABC_TABLE_B_TO_S] where  FILES_TYPE='@{item().SOURCE_FILE_TYPE}' order by BATCH_ID desc",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DS_SQL_ABC_AUDIT",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": false
+							}
+						},
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "LAST_UPDATED_DATE",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@bool(equals(activity('LAST_UPDATED_DATE').output.count,1))",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "BLOB_TO_SQL_False",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "DelimitedTextSource",
+												"storeSettings": {
+													"type": "AzureBlobFSReadSettings",
+													"recursive": false,
+													"wildcardFileName": {
+														"value": "@{item().SOURCE_FILE_TYPE}*",
+														"type": "Expression"
+													},
+													"enablePartitionDiscovery": false
+												},
+												"formatSettings": {
+													"type": "DelimitedTextReadSettings"
+												}
+											},
+											"sink": {
+												"type": "AzureSqlSink",
+												"writeBehavior": "insert"
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "DS_Last_Modified",
+												"type": "DatasetReference"
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "DS_SQL_LAST_MOD",
+												"type": "DatasetReference",
+												"parameters": {
+													"TableName": {
+														"value": "@item().TARGET_TABLE_NAME",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									},
+									{
+										"name": "ABC_Table_2",
+										"type": "SqlServerStoredProcedure",
+										"dependsOn": [
+											{
+												"activity": "BLOB_TO_SQL_False",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"storedProcedureName": "[dbo].[SP_ABC_B_TO_S]",
+											"storedProcedureParameters": {
+												"BATCH_Id": {
+													"value": {
+														"value": "@utcnow()",
+														"type": "Expression"
+													},
+													"type": "DateTime"
+												},
+												"CDC_COLUMN_NAME": {
+													"value": null,
+													"type": "String"
+												},
+												"CDC_COLUMN_VALUE": {
+													"value": null,
+													"type": "Int64"
+												},
+												"eXCEPTION_RECORD_COUNT": {
+													"value": null,
+													"type": "Int64"
+												},
+												"FILES_TYPE": {
+													"value": {
+														"value": "@item().SOURCE_FILE_TYPE",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"JOB_ID": {
+													"value": {
+														"value": "@item().JOB_ID",
+														"type": "Expression"
+													},
+													"type": "Int32"
+												},
+												"JOB_NAME": {
+													"value": {
+														"value": "@item().JOB_NAME",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"JOB_STATUS": {
+													"value": {
+														"value": "@activity('BLOB_TO_SQL_False').status",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"RUNTIME_PARAMETER_ID": {
+													"value": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"SOURCE_RECORD_COUNT": {
+													"value": {
+														"value": "@activity('BLOB_TO_SQL_False').output.rowsRead",
+														"type": "Expression"
+													},
+													"type": "Int64"
+												},
+												"TARGET_RECORD_COUNT": {
+													"value": {
+														"value": "@activity('BLOB_TO_SQL_False').output.rowsCopied",
+														"type": "Expression"
+													},
+													"type": "Int64"
+												}
+											}
+										},
+										"linkedServiceName": {
+											"referenceName": "AzureSqlDatabase1",
+											"type": "LinkedServiceReference"
+										}
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "BLOB_TO_SQL_True",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "DelimitedTextSource",
+												"storeSettings": {
+													"type": "AzureBlobFSReadSettings",
+													"recursive": false,
+													"modifiedDatetimeStart": {
+														"value": "@activity('LAST_UPDATED_DATE').output.value[0].BATCH_ID",
+														"type": "Expression"
+													},
+													"modifiedDatetimeEnd": {
+														"value": "@utcnow()",
+														"type": "Expression"
+													},
+													"wildcardFileName": {
+														"value": "@{item().SOURCE_FILE_TYPE}*",
+														"type": "Expression"
+													},
+													"enablePartitionDiscovery": false
+												},
+												"formatSettings": {
+													"type": "DelimitedTextReadSettings"
+												}
+											},
+											"sink": {
+												"type": "AzureSqlSink",
+												"writeBehavior": "insert"
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "DS_Last_Modified",
+												"type": "DatasetReference"
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "DS_SQL_LAST_MOD",
+												"type": "DatasetReference",
+												"parameters": {
+													"TableName": {
+														"value": "@item().TARGET_TABLE_NAME",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									},
+									{
+										"name": "ABC_Table_1",
+										"type": "SqlServerStoredProcedure",
+										"dependsOn": [
+											{
+												"activity": "BLOB_TO_SQL_True",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "7.00:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"storedProcedureName": "[dbo].[SP_ABC_B_TO_S]",
+											"storedProcedureParameters": {
+												"BATCH_Id": {
+													"value": {
+														"value": "@utcnow()",
+														"type": "Expression"
+													},
+													"type": "DateTime"
+												},
+												"CDC_COLUMN_NAME": {
+													"value": null,
+													"type": "String"
+												},
+												"CDC_COLUMN_VALUE": {
+													"value": null,
+													"type": "Int64"
+												},
+												"eXCEPTION_RECORD_COUNT": {
+													"value": null,
+													"type": "Int64"
+												},
+												"FILES_TYPE": {
+													"value": {
+														"value": "@item().SOURCE_FILE_TYPE",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"JOB_ID": {
+													"value": {
+														"value": "@item().JOB_ID",
+														"type": "Expression"
+													},
+													"type": "Int32"
+												},
+												"JOB_NAME": {
+													"value": {
+														"value": "@item().JOB_NAME",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"JOB_STATUS": {
+													"value": {
+														"value": "@activity('BLOB_TO_SQL_True').status",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"RUNTIME_PARAMETER_ID": {
+													"value": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													},
+													"type": "String"
+												},
+												"SOURCE_RECORD_COUNT": {
+													"value": {
+														"value": "@activity('BLOB_TO_SQL_True').output.rowsRead",
+														"type": "Expression"
+													},
+													"type": "Int64"
+												},
+												"TARGET_RECORD_COUNT": {
+													"value": {
+														"value": "@activity('BLOB_TO_SQL_True').output.rowsCopied",
+														"type": "Expression"
+													},
+													"type": "Int64"
+												}
+											}
+										},
+										"linkedServiceName": {
+											"referenceName": "AzureSqlDatabase1",
+											"type": "LinkedServiceReference"
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "GET_METADATA_TABLE_B_to_S",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT * FROM [dbo].[Metadata_driven_B_to_S]",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_azuresql",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"folder": {
+			"name": "Maneendra"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-07-08T03:02:40Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

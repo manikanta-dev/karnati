@@ -1,19 +1,16 @@
 {
-	"name": "DelimitedText1",
+	"name": "DS_mergedFiles",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "AzureDataLakeStorage2",
 			"type": "LinkedServiceReference"
-		},
-		"folder": {
-			"name": "Metadata_dataset"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileSystem": "rpmsdata"
+				"fileSystem": "mergedfiles"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

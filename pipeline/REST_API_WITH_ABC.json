@@ -1,0 +1,382 @@
+{
+	"name": "REST_API_WITH_ABC",
+	"properties": {
+		"activities": [
+			{
+				"name": "GET_API_URLS",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ABCAuditMainSQL",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select * from [dbo].[METADATA_DRIVENTABLE] where source_type='API'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_azuresql",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "LOOPING_API_URLS",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GET_API_URLS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GET_API_URLS').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Copy_API_BLOB",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET"
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "RestResource2",
+									"type": "DatasetReference",
+									"parameters": {
+										"API_URL": "@item().BASE_URL"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "Ds_json",
+									"type": "DatasetReference",
+									"parameters": {
+										"File_Name": "@concat(item().TARGET_TABLE_NAME,'_',formatDateTime(utcnow(),'yyyyMMdd_HHmmss'))"
+									}
+								}
+							]
+						},
+						{
+							"name": "AppendErrors",
+							"type": "AppendVariable",
+							"dependsOn": [
+								{
+									"activity": "Copy_API_BLOB",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Error",
+								"value": {
+									"value": "@activity('Copy_API_BLOB').output.Errors[0].Message",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "CollectStartTIme",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "BatchStartTime",
+					"value": {
+						"value": "@utcnow()",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ABCAuditMainSQL",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "CollectStartTIme",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "ABCAuditMainSQL",
+						"type": "DataFlowReference",
+						"parameters": {
+							"Master_Audit_ID": {
+								"value": "'@{pipeline().RunId}'",
+								"type": "Expression"
+							},
+							"Category": {
+								"value": "'@{variables('Category')}'",
+								"type": "Expression"
+							},
+							"AuditLayer": {
+								"value": "'@{variables('Layer')}'",
+								"type": "Expression"
+							},
+							"SourceType": {
+								"value": "'@{variables('SrcType')}'",
+								"type": "Expression"
+							},
+							"DestType": {
+								"value": "'@{variables('dstType')}'",
+								"type": "Expression"
+							},
+							"StartTimeStamp": {
+								"value": "'@{variables('BatchStartTime')}'",
+								"type": "Expression"
+							},
+							"EndTimeStamp": {
+								"value": "'@{variables('BatchEndTIme')}'",
+								"type": "Expression"
+							},
+							"Error": {
+								"value": "@variables('Error')",
+								"type": "Expression"
+							},
+							"RestartFlag": {
+								"value": "'@{variables('RestartFlag')}'",
+								"type": "Expression"
+							},
+							"Status": {
+								"value": "'@{variables('Status')}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Collect EndTIme",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "LOOPING_API_URLS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "BatchEndTIme",
+					"value": {
+						"value": "@utcnow()",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "PostPipelineAudit",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Collect EndTIme",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "SetStatus",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "ABCAuditMainSQL",
+						"type": "DataFlowReference",
+						"parameters": {
+							"Master_Audit_ID": {
+								"value": "'@{pipeline().RunId}'",
+								"type": "Expression"
+							},
+							"Category": {
+								"value": "'@{variables('Category')}'",
+								"type": "Expression"
+							},
+							"AuditLayer": {
+								"value": "'@{variables('Layer')}'",
+								"type": "Expression"
+							},
+							"SourceType": {
+								"value": "'@{variables('SrcType')}'",
+								"type": "Expression"
+							},
+							"DestType": {
+								"value": "'@{variables('dstType')}'",
+								"type": "Expression"
+							},
+							"StartTimeStamp": {
+								"value": "'@{variables('BatchStartTime')}'",
+								"type": "Expression"
+							},
+							"EndTimeStamp": {
+								"value": "'@{variables('BatchEndTIme')}'",
+								"type": "Expression"
+							},
+							"Error": {
+								"value": "@variables('Error')",
+								"type": "Expression"
+							},
+							"RestartFlag": {
+								"value": "'@{variables('RestartFlag')}'",
+								"type": "Expression"
+							},
+							"Status": {
+								"value": "'@{variables('Status')}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "SetStatus",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "LOOPING_API_URLS",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Status",
+					"value": {
+						"value": "'COMPLETE'",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"BatchStartTime": {
+				"type": "String"
+			},
+			"BatchEndTIme": {
+				"type": "String",
+				"defaultValue": "--"
+			},
+			"Category": {
+				"type": "String",
+				"defaultValue": "API_Data"
+			},
+			"Layer": {
+				"type": "String",
+				"defaultValue": "Ingestion"
+			},
+			"Status": {
+				"type": "String",
+				"defaultValue": "INPROGRESS"
+			},
+			"SrcType": {
+				"type": "String",
+				"defaultValue": "REST_API"
+			},
+			"dstType": {
+				"type": "String",
+				"defaultValue": "AZURE_BLOB"
+			},
+			"Error": {
+				"type": "Array",
+				"defaultValue": []
+			},
+			"RestartFlag": {
+				"type": "Boolean",
+				"defaultValue": false
+			}
+		},
+		"folder": {
+			"name": "API"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-07-15T20:31:51Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

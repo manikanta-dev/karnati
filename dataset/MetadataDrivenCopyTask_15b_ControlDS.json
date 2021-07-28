@@ -1,16 +1,19 @@
 {
-	"name": "AzureSqlTable1",
+	"name": "MetadataDrivenCopyTask_15b_ControlDS",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureSqlDatabase1",
+			"referenceName": "linkedService1",
 			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MetadataDrivenCopyTask_15b_20210723"
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "Azure Data Lake Storage Gen2 file"
+			"table": "Meta"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"

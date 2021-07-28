@@ -1,0 +1,38 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "RPMS_DATA",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable9",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Aggregate1"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "DerivedColumn1"
+				}
+			],
+			"script": "source(output(\n\t\tPOLICY_NUMBER as string,\n\t\tADDRESS as string,\n\t\tCITY as string,\n\t\tCOUNTY_NAME as string,\n\t\tSTATE_CODE as string,\n\t\tZIP as short,\n\t\tLATITUDE as double,\n\t\tLONGITUDE as double,\n\t\tPOLICY_EFF_DATE as string,\n\t\tAGENT as string,\n\t\tPOLICY_FORM as string,\n\t\tBUSINESS_SEGMENT as string,\n\t\tTIV as integer,\n\t\tWRITTEN_PREMIUM as short,\n\t\tDEDUCTABLE as short,\n\t\tus_esdb_building_attributes_buildingHeight as short,\n\t\tus_esdb_building_attributes_floorOccupancy as short,\n\t\tus_esdb_building_attributes_garagingDescription as string,\n\t\tus_esdb_building_attributes_numOfStories as short,\n\t\tus_esdb_building_attributes_pool as boolean,\n\t\tus_esdb_building_attributes_roofCoverCode as string,\n\t\tus_esdb_building_attributes_roofCoverDescription as string,\n\t\tus_esdb_building_attributes_yearBuilt as short,\n\t\tna_eq_hazard_landslideDescription as string,\n\t\tna_eq_hazard_landslideIndex as short,\n\t\tna_eq_hazard_liquefactionDescription as string,\n\t\tna_eq_hazard_liquefactionIndex as double,\n\t\tna_ws_hazard_distanceToCoast as double,\n\t\tna_ws_hazard_distanceToCoastUnit as string,\n\t\tna_ws_hazard_elevationGround as double,\n\t\tna_ws_hazard_elevationGroundUnit as string,\n\t\tus_cs_loss_cost_buildingAlr as short,\n\t\tus_cs_loss_cost_buildingAlrHail as short,\n\t\tus_cs_loss_cost_buildingAlrTornado as short,\n\t\tus_cs_loss_cost_buildingAlrWind as short,\n\t\tus_cs_loss_cost_groundUpLoss as double,\n\t\tus_cs_risk_score_scoreOverall as short,\n\t\tus_eq_loss_cost_buildingAlr as double,\n\t\tus_eq_loss_cost_groundUpLoss as double,\n\t\tus_eq_risk_score_scoreOverall as short,\n\t\tus_fema_firm_floodZone as string,\n\t\tus_fema_firm_floodway as boolean,\n\t\tus_fl_loss_cost_buildingAlr as double,\n\t\tus_fl_loss_cost_buildingAlrFlood as double,\n\t\tus_fl_loss_cost_buildingAlrSurge as double,\n\t\tus_fl_loss_cost_grossLoss as short,\n\t\tus_fl_loss_cost_groundUpLoss as double,\n\t\tus_fl_risk_score_score100yr as short,\n\t\tus_fl_risk_score_scoreOverall as short,\n\t\tus_mmi_mmi100yr as short,\n\t\tus_wf_supplemental_hazard_distanceToCalfireHigh as short,\n\t\tus_wf_supplemental_hazard_distanceToCalfireMedium as short,\n\t\tus_wf_supplemental_hazard_distanceToCalfireVeryHigh as short,\n\t\tus_ws_loss_cost_buildingAlr as double,\n\t\tus_ws_risk_score_score100yr as short,\n\t\tus_ws_risk_score_scoreOverall as short,\n\t\tus_wt_loss_cost_buildingAlr as double,\n\t\tus_wt_risk_score_score50yr as short,\n\t\tus_wt_risk_score_scoreOverall as short,\n\t\tna_eq_hazard_liquefactionIndex_IND as boolean,\n\t\tna_ws_hazard_distanceToCoast_IND as boolean,\n\t\tus_cs_loss_cost_buildingAlrHail_IND as boolean,\n\t\tus_cs_loss_cost_buildingAlrTornado_IND as boolean,\n\t\tus_eq_loss_cost_buildingAlr_IND as boolean,\n\t\tus_fl_loss_cost_buildingAlrFlood_IND as boolean,\n\t\tus_wf_supplemental_hazard_distanceToCalfireVeryHigh_IND as boolean,\n\t\tus_cs_loss_cost_buildingAlrWind_IND as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 aggregate(groupBy(CITY),\n\tnumberOfCities = count(CITY)) ~> Aggregate1\nDerivedColumn1 alterRow(upsertIf(true())) ~> AlterRow1\nAggregate1 derive(time = currentUTC()) ~> DerivedColumn1\nAlterRow1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['numberOfCities'],\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tCITY,\n\t\tnumberOfCities\n\t)) ~> sink1"
+		}
+	}
+}
