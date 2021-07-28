@@ -1,0 +1,9 @@
+{
+	"name": "datafactorypavan",
+	"location": "centralus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "97f2ab01-a3af-4049-932b-8421ac574ad5",
+		"tenantId": "92e1883e-ee91-4763-b5c1-98978f949f9a"
+	}
+}
