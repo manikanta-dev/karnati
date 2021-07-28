@@ -1,0 +1,32 @@
+{
+	"name": "AzureSqlTable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "custid",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "custname",
+				"type": "varchar"
+			},
+			{
+				"name": "custnumber",
+				"type": "bigint",
+				"precision": 19
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "cust1"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

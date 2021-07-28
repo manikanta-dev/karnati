@@ -1,0 +1,9 @@
+{
+	"name": "sivadata1",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "91728b02-8474-4137-a19b-0365c0089cf7",
+		"tenantId": "92e1883e-ee91-4763-b5c1-98978f949f9a"
+	}
+}
